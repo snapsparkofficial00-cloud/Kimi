@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 NeuroSwarm AI v2.1 - 14 Agent Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --bg-hover: #222230;
+            --border: #2a2a3a;
+            --border-glow: #3a3a50;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8a8aa0;
+            --text-muted: #5a5a70;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #a855f7;
+            --accent-green: #22c55e;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+            --accent-pink: #ec4899;
+            --accent-yellow: #eab308;
+            --accent-blue: #3b82f6;
+            --accent-teal: #14b8a6;
+            --glow-cyan: rgba(0, 212, 255, 0.15);
+            --glow-purple: rgba(168, 85, 247, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 20s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            margin-bottom: 16px;
+        }
+        .logo-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 20px var(--glow-cyan);
+        }
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav-section { margin-top: 8px; }
+        .nav-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 8px 12px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(168, 85, 247, 0.1));
+            border-color: var(--border-glow);
+            color: var(--accent-cyan);
+        }
+        .nav-item .icon {
+            width: 20px; height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .status-indicator {
+            margin-top: auto;
+            padding: 16px 12px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .status-row:last-child { margin-bottom: 0; }
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+        .status-dot.paused {
+            background: var(--accent-red);
+            box-shadow: 0 0 8px var(--accent-red);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .main {
+            padding: 24px 32px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .header-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-glow);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            color: white;
+            box-shadow: 0 4px 20px var(--glow-cyan);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 30px var(--glow-cyan);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, var(--accent-red), #dc2626);
+            border: none;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-2px);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            opacity: 0.5;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stat-change {
+            font-size: 12px;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .stat-change.positive { color: var(--accent-green); }
+        .stat-change.negative { color: var(--accent-red); }
+
+        .command-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .command-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+            border-radius: 16px 16px 0 0;
+        }
+        .command-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .command-input-wrapper {
+            display: flex;
+            gap: 12px;
+        }
+        .command-input {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .command-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px var(--glow-cyan);
+        }
+        .command-input::placeholder {
+            color: var(--text-muted);
+        }
+        .command-input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .agent-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .agent-card:hover {
+            border-color: var(--border-glow);
+            transform: translateY(-3px);
+        }
+        .agent-card.active-agent {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 30px var(--glow-cyan);
+        }
+        .agent-card.active-agent::after {
+            content: '';
+            position: absolute;
+            top: 12px; right: 12px;
+            width: 8px; height: 8px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-cyan);
+            animation: pulse 1.5s infinite;
+        }
+        .agent-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .agent-avatar {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: linear-gradient(135deg, var(--bg-hover), var(--bg-primary));
+            border: 1px solid var(--border);
+        }
+        .agent-info h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .agent-info span {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .agent-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        .agent-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+        .agent-status .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+        }
+
+        .activity-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .panel-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+        .panel-badge {
+            background: var(--bg-hover);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .log-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            animation: slideIn 0.3s ease;
+        }
+        .log-item:last-child { border-bottom: none; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .log-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            min-width: 60px;
+        }
+        .log-agent {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            min-width: 80px;
+            text-align: center;
+        }
+        .log-agent.commander { background: rgba(0, 212, 255, 0.1); color: var(--accent-cyan); }
+        .log-agent.researcher { background: rgba(168, 85, 247, 0.1); color: var(--accent-purple); }
+        .log-agent.coder { background: rgba(34, 197, 94, 0.1); color: var(--accent-green); }
+        .log-agent.creative { background: rgba(236, 72, 153, 0.1); color: var(--accent-pink); }
+        .log-agent.analyst { background: rgba(234, 179, 8, 0.1); color: var(--accent-yellow); }
+        .log-agent.executor { background: rgba(249, 115, 22, 0.1); color: var(--accent-orange); }
+        .log-agent.critic { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .log-agent.social { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
+        .log-agent.email { background: rgba(20, 184, 166, 0.1); color: var(--accent-teal); }
+        .log-agent.crypto { background: rgba(234, 179, 8, 0.1); color: var(--accent-yellow); }
+        .log-agent.media { background: rgba(236, 72, 153, 0.1); color: var(--accent-pink); }
+        .log-agent.scraper { background: rgba(168, 85, 247, 0.1); color: var(--accent-purple); }
+        .log-agent.translator { background: rgba(34, 197, 94, 0.1); color: var(--accent-green); }
+        .log-agent.security { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+        .log-agent.system { background: rgba(90, 90, 112, 0.1); color: var(--text-muted); }
+        .log-msg {
+            font-size: 13px;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .task-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+        .task-item:hover {
+            border-color: var(--border-glow);
+        }
+        .task-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .task-id {
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+        }
+        .task-status {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .task-status.planning { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); }
+        .task-status.executing { background: rgba(0, 212, 255, 0.15); color: var(--accent-cyan); }
+        .task-status.reviewing { background: rgba(234, 179, 8, 0.15); color: var(--accent-yellow); }
+        .task-status.synthesizing { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+        .task-status.completed { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+        .task-status.failed { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+        .task-desc {
+            font-size: 13px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .task-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .task-result {
+            margin-top: 8px;
+            padding: 10px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'JetBrains Mono', monospace;
+            border: 1px solid var(--border);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 1000;
+            animation: toastIn 0.3s ease;
+            max-width: 400px;
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .toast-title { font-weight: 700; margin-bottom: 4px; }
+        .toast-msg { font-size: 13px; color: var(--text-secondary); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-glow); }
+
+        @media (max-width: 1400px) {
+            .agent-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 1400px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .agent-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .app { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .activity-section { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .agent-grid { grid-template-columns: 1fr; }
+            .main { padding: 16px; }
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 8px 0;
+        }
+        .typing-indicator span {
+            width: 6px; height: 6px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 100;
+        }
+        .connection-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+        .connection-dot.disconnected {
+            background: var(--accent-red);
+            animation: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="connection-status" id="connectionStatus">
+        <div class="connection-dot" id="connDot"></div>
+        <span id="connText">Connecting...</span>
+    </div>
+
+    <div class="app">
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">🧠</div>
+                <div>
+                    <div class="logo-text">NeuroSwarm</div>
+                    <div class="logo-sub">AI Agent Team v2.1</div>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-label">Command</div>
+                <div class="nav-item active" onclick="showTab('dashboard')">
+                    <span class="icon">📊</span> Dashboard
+                </div>
+                <div class="nav-item" onclick="showTab('agents')">
+                    <span class="icon">🤖</span> Agent Team
+                </div>
+                <div class="nav-item" onclick="showTab('tasks')">
+                    <span class="icon">📋</span> Task Queue
+                </div>
+                <div class="nav-item" onclick="showTab('memory')">
+                    <span class="icon">🧠</span> Memory Bank
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-label">Tools</div>
+                <div class="nav-item" onclick="showTab('social')">
+                    <span class="icon">📱</span> Social Media
+                </div>
+                <div class="nav-item" onclick="showTab('crypto')">
+                    <span class="icon">📈</span> Crypto Trading
+                </div>
+                <div class="nav-item" onclick="showTab('media')">
+                    <span class="icon">🎬</span> Media Creator
+                </div>
+                <div class="nav-item" onclick="showTab('security')">
+                    <span class="icon">🛡️</span> Security
+                </div>
+                <div class="nav-item" onclick="showTab('aionui')">
+                    <span class="icon">🔗</span> AionUi
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-label">System</div>
+                <div class="nav-item" onclick="showTab('logs')">
+                    <span class="icon">📜</span> Activity Logs
+                </div>
+                <div class="nav-item" onclick="showTab('settings')">
+                    <span class="icon">⚙️</span> Settings
+                </div>
+            </div>
+
+            <div class="status-indicator">
+                <div class="status-row">
+                    <span style="color: var(--text-muted); font-size: 12px; font-weight: 600;">System Status</span>
+                    <span style="color: var(--accent-green); font-size: 12px; font-weight: 700;" id="sysStatusText">ONLINE</span>
+                </div>
+                <div class="status-row">
+                    <span style="color: var(--text-muted);">Uptime</span>
+                    <span id="uptime" style="font-family: 'JetBrains Mono', monospace; color: var(--text-secondary);">00:00:00</span>
+                </div>
+                <div class="status-row">
+                    <span style="color: var(--text-muted);">Agents Active</span>
+                    <span style="color: var(--accent-cyan); font-weight: 700;">15/15</span>
+                </div>
+                <div class="status-row">
+                    <span style="color: var(--text-muted);">Mode</span>
+                    <span style="color: var(--accent-purple); font-weight: 700;" id="modeText">AUTONOMOUS</span>
+                </div>
+                <div class="status-row">
+                    <span style="color: var(--text-muted);">AionUi</span>
+                    <span style="color: var(--text-muted); font-weight: 700;" id="aionuiStatus">Checking...</span>
+                </div>
+                <div class="status-row">
+                    <span style="color: var(--text-muted);">GLM-5.2</span>
+                    <span style="color: var(--text-muted); font-weight: 700;" id="glm52Sidebar">Checking...</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="header">
+                <h1 class="header-title">Agent Command Center v2.1</h1>
+                <div class="header-actions">
+                    <button class="btn" onclick="toggleTeam()" id="toggleBtn">
+                        <span>⏸️</span> Pause Team
+                    </button>
+                    <button class="btn btn-primary" onclick="focusCommand()">
+                        <span>⚡</span> New Command
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Active Tasks</div>
+                    <div class="stat-value" id="activeTasks">0</div>
+                    <div class="stat-change positive" id="activeTasksChange">No active tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-value" id="completedTasks">0</div>
+                    <div class="stat-change positive">Running 24/7</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Memory Items</div>
+                    <div class="stat-value" id="memoryItems">0</div>
+                    <div class="stat-change positive">Learning continuously</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Team Efficiency</div>
+                    <div class="stat-value" style="color: var(--accent-cyan);" id="efficiency">99%</div>
+                    <div class="stat-change positive" id="efficiencyText">Optimal performance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">AionUi Agents</div>
+                    <div class="stat-value" style="color: var(--accent-purple);" id="aionuiAgents">0</div>
+                    <div class="stat-change" id="aionuiStatusText">Not connected</div>
+                </div>
+            </div>
+
+            <div class="command-section">
+                <div class="command-label">
+                    <span>💬</span> What do you want the team to do?
+                </div>
+                <div class="command-input-wrapper">
+                    <input type="text" class="command-input" id="commandInput" 
+                        placeholder="e.g., 'Build a React app', 'Research AI trends', 'Analyze BTC', 'Create social media posts'..."
+                        onkeypress="if(event.key==='Enter') sendCommand()">
+                    <button class="btn btn-primary" onclick="sendCommand()" id="executeBtn">
+                        <span>🚀</span> Execute
+                    </button>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <span>🤖</span> Agent Team (15 Active)
+            </div>
+            <div class="agent-grid" id="agentGrid"></div>
+
+            <div class="activity-section">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">📜 Live Activity</span>
+                        <span class="panel-badge" id="logCount">0</span>
+                    </div>
+                    <div id="activityFeed">
+                        <div class="typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">📋 Recent Tasks</span>
+                        <span class="panel-badge" id="taskCount">0</span>
+                    </div>
+                    <div id="taskFeed">
+                        <div style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px;">
+                            No active tasks. Send a command to activate the team!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ==================== PARTICLES ====================
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDelay = Math.random() * 20 + 's';
+                p.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(p);
+            }
+        }
+        createParticles();
+
+        // ==================== AGENTS ====================
+        const agents = [
+            { key: 'commander', name: 'Commander', role: 'Orchestrator', icon: '👑', desc: 'Strategic leader. Coordinates all operations and delegates tasks.' },
+            { key: 'researcher', name: 'Deep Research', role: 'Research', icon: '🔬', desc: 'Fact-obsessed investigator. Gathers and verifies information.' },
+            { key: 'coder', name: 'Code Architect', role: 'Development', icon: '💻', desc: 'Writes clean, production-ready code across multiple languages.' },
+            { key: 'creative', name: 'Creative Mind', role: 'Creative', icon: '🎨', desc: 'Generates ideas, content, designs, and marketing copy.' },
+            { key: 'analyst', name: 'Data Oracle', role: 'Analysis', icon: '📊', desc: 'Analyzes data, finds patterns, creates visualizations.' },
+            { key: 'executor', name: 'Task Runner', role: 'Execution', icon: '⚡', desc: 'Executes plans, automates workflows, manages schedules.' },
+            { key: 'critic', name: 'Quality Critic', role: 'Review', icon: '🔍', desc: 'Reviews all outputs, finds errors, ensures quality.' },
+            { key: 'social', name: 'Social Media Guru', role: 'Social', icon: '📱', desc: 'Manages social media, creates posts, analyzes engagement.' },
+            { key: 'email', name: 'Email Master', role: 'Email', icon: '📧', desc: 'Sends emails, manages templates, handles campaigns.' },
+            { key: 'crypto', name: 'Crypto Trader', role: 'Trading', icon: '📈', desc: 'Analyzes crypto markets, tracks prices, generates signals.' },
+            { key: 'media', name: 'Media Creator', role: 'Media', icon: '🎬', desc: 'Generates images, videos, thumbnails, and visual content.' },
+            { key: 'scraper', name: 'Web Scraper', role: 'Scraping', icon: '🕷️', desc: 'Scrapes websites, extracts data, monitors changes.' },
+            { key: 'translator', name: 'Linguist', role: 'Translation', icon: '🌍', desc: 'Translates content, localizes for cultures, summarizes.' },
+            { key: 'security', name: 'Guardian', role: 'Security', icon: '🛡️', desc: 'Monitors threats, secures data, detects attacks.' },
+            { key: 'glm52', name: 'GLM-5.2 Engineer', role: 'Coding', icon: '🔧', desc: 'Zhipu AI GLM-5.2 — fixes bugs, refactors, creates PRs on GitHub.' }
+        ];
+
+        function renderAgents() {
+            const grid = document.getElementById('agentGrid');
+            grid.innerHTML = agents.map(a => `
+                <div class="agent-card" id="agent-${a.key}" onclick="activateAgent('${a.key}')">
+                    <div class="agent-header">
+                        <div class="agent-avatar">${a.icon}</div>
+                        <div class="agent-info">
+                            <h3>${a.name}</h3>
+                            <span>${a.role}</span>
+                        </div>
+                    </div>
+                    <div class="agent-desc">${a.desc}</div>
+                    <div class="agent-status">
+                        <span class="dot"></span>
+                        <span>Active & Ready</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        renderAgents();
+
+        // ==================== STATE ====================
+        let isRunning = true;
+        let logs = [];
+        let tasks = [];
+        let startTime = Date.now();
+        let sseConnected = false;
+        let eventSource = null;
+
+        // ==================== SSE (REAL-TIME) ====================
+        function connectSSE() {
+            if (eventSource) eventSource.close();
+
+            eventSource = new EventSource('/api/events');
+
+            eventSource.onopen = () => {
+                sseConnected = true;
+                updateConnectionStatus(true);
+            };
+
+            eventSource.onmessage = (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+                    if (data.type === 'log') {
+                        logs.unshift(data);
+                        if (logs.length > 500) logs.pop();
+                        renderLogs();
+                    } else if (data.type === 'task') {
+                        const idx = tasks.findIndex(t => t.id === data.id);
+                        if (idx >= 0) {
+                            tasks[idx] = data;
+                        } else {
+                            tasks.unshift(data);
+                        }
+                        if (tasks.length > 50) tasks.pop();
+                        renderTasks();
+                        // Flash agent card
+                        const agentKey = data.status?.replace('running_', '');
+                        if (agentKey && AGENTS[agentKey]) {
+                            activateAgent(agentKey);
+                        }
+                    }
+                } catch (err) {}
+            };
+
+            eventSource.onerror = () => {
+                sseConnected = false;
+                updateConnectionStatus(false);
+                setTimeout(connectSSE, 3000);
+            };
+        }
+
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('connDot');
+            const text = document.getElementById('connText');
+            if (connected) {
+                dot.classList.remove('disconnected');
+                text.textContent = 'Live';
+                text.style.color = 'var(--accent-green)';
+            } else {
+                dot.classList.add('disconnected');
+                text.textContent = 'Reconnecting...';
+                text.style.color = 'var(--accent-red)';
+            }
+        }
+
+        // ==================== UPTIME ====================
+        function updateUptime() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const h = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+            const m = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+            const s = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('uptime').textContent = `${h}:${m}:${s}`;
+        }
+        setInterval(updateUptime, 1000);
+
+        // ==================== STATUS FETCHING ====================
+        async function fetchGLM52Status() {
+            try {
+                const res = await fetch('/api/glm52/status');
+                if (res.ok) {
+                    const data = await res.json();
+                    const sidebarStatus = document.getElementById('glm52Sidebar');
+                    if (data.apiKeyConfigured) {
+                        if (sidebarStatus) {
+                            sidebarStatus.textContent = data.connected ? 'Connected' : 'Disconnected';
+                            sidebarStatus.style.color = data.connected ? 'var(--accent-green)' : 'var(--accent-red)';
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+        setInterval(fetchGLM52Status, 10000);
+
+        async function fetchAionUiStatus() {
+            try {
+                const res = await fetch('/api/aionui/status');
+                if (res.ok) {
+                    const data = await res.json();
+                    const agentsEl = document.getElementById('aionuiAgents');
+                    const statusEl = document.getElementById('aionuiStatus');
+                    const sidebarStatus = document.getElementById('aionuiStatus');
+
+                    if (data.enabled) {
+                        const count = data.connectedAgents?.length || 0;
+                        agentsEl.textContent = count;
+                        document.getElementById('aionuiStatusText').textContent = count > 0 ? `${count} agents detected` : 'Connected';
+                        document.getElementById('aionuiStatusText').className = 'stat-change positive';
+                        if (sidebarStatus) {
+                            sidebarStatus.textContent = 'Connected';
+                            sidebarStatus.style.color = 'var(--accent-green)';
+                        }
+                    } else {
+                        agentsEl.textContent = '0';
+                        document.getElementById('aionuiStatusText').textContent = 'Not installed';
+                        document.getElementById('aionuiStatusText').className = 'stat-change';
+                        if (sidebarStatus) {
+                            sidebarStatus.textContent = 'Not installed';
+                            sidebarStatus.style.color = 'var(--text-muted)';
+                        }
+                    }
+                }
+            } catch (e) {
+                document.getElementById('aionuiAgents').textContent = '?';
+                document.getElementById('aionuiStatusText').textContent = 'Unknown';
+            }
+        }
+        setInterval(fetchAionUiStatus, 5000);
+
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/api/status');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('activeTasks').textContent = data.activeTasks || 0;
+                    document.getElementById('completedTasks').textContent = data.completedTasks || 0;
+                    document.getElementById('memoryItems').textContent = data.memorySize || 0;
+
+                    // Update mode display
+                    const modeText = document.getElementById('modeText');
+                    const sysStatus = document.getElementById('sysStatusText');
+                    if (data.mode === 'PAUSED') {
+                        modeText.textContent = 'PAUSED';
+                        modeText.style.color = 'var(--accent-red)';
+                        sysStatus.textContent = 'PAUSED';
+                        sysStatus.style.color = 'var(--accent-red)';
+                        isRunning = false;
+                        document.getElementById('toggleBtn').innerHTML = '<span>▶️</span> Resume Team';
+                        document.getElementById('toggleBtn').classList.add('btn-danger');
+                    } else {
+                        modeText.textContent = 'AUTONOMOUS';
+                        modeText.style.color = 'var(--accent-purple)';
+                        sysStatus.textContent = 'ONLINE';
+                        sysStatus.style.color = 'var(--accent-green)';
+                        isRunning = true;
+                        document.getElementById('toggleBtn').innerHTML = '<span>⏸️</span> Pause Team';
+                        document.getElementById('toggleBtn').classList.remove('btn-danger');
+                    }
+
+                    // Update efficiency based on real data
+                    const total = (data.activeTasks || 0) + (data.completedTasks || 0);
+                    const eff = total > 0 ? Math.round((data.completedTasks / total) * 100) : 99;
+                    document.getElementById('efficiency').textContent = eff + '%';
+
+                    const activeChange = document.getElementById('activeTasksChange');
+                    if (data.activeTasks > 0) {
+                        activeChange.textContent = `${data.activeTasks} running now`;
+                        activeChange.className = 'stat-change positive';
+                    } else {
+                        activeChange.textContent = 'No active tasks';
+                        activeChange.className = 'stat-change';
+                    }
+                }
+            } catch (e) {
+                // Fallback to local state
+                document.getElementById('activeTasks').textContent = tasks.filter(t => t.status !== 'completed' && t.status !== 'failed').length;
+                document.getElementById('completedTasks').textContent = tasks.filter(t => t.status === 'completed').length;
+                document.getElementById('memoryItems').textContent = logs.length;
+            }
+        }
+        setInterval(fetchStatus, 3000);
+
+        // ==================== LOGS & TASKS ====================
+        async function fetchLogs() {
+            try {
+                const res = await fetch('/api/logs');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.length > logs.length || JSON.stringify(data.slice(0,5)) !== JSON.stringify(logs.slice(0,5))) {
+                        logs = data;
+                        renderLogs();
+                    }
+                }
+            } catch (e) {}
+        }
+        setInterval(fetchLogs, 2000);
+
+        async function fetchTasks() {
+            try {
+                const res = await fetch('/api/tasks');
+                if (res.ok) {
+                    const data = await res.json();
+                    tasks = data;
+                    renderTasks();
+                }
+            } catch (e) {
+                renderTasks();
+            }
+        }
+        setInterval(fetchTasks, 3000);
+
+        function renderLogs() {
+            const feed = document.getElementById('activityFeed');
+            document.getElementById('logCount').textContent = logs.length;
+            if (logs.length === 0) {
+                feed.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                return;
+            }
+            feed.innerHTML = logs.slice(0, 20).map(log => {
+                const time = new Date(log.timestamp).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                return `<div class="log-item">
+                    <span class="log-time">${time}</span>
+                    <span class="log-agent ${log.agent}">${log.agent}</span>
+                    <span class="log-msg">${log.action}: ${(log.details || '').substring(0, 80)}${(log.details || '').length > 80 ? '...' : ''}</span>
+                </div>`;
+            }).join('');
+        }
+
+        function renderTasks() {
+            const feed = document.getElementById('taskFeed');
+            document.getElementById('taskCount').textContent = tasks.length;
+            if (tasks.length === 0) {
+                feed.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px;">No active tasks. Send a command to activate the team!</div>';
+                return;
+            }
+            feed.innerHTML = tasks.slice(0, 10).map(task => {
+                let resultHtml = '';
+                if (task.finalOutput) {
+                    resultHtml = `<div class="task-result">${task.finalOutput.substring(0, 300)}${task.finalOutput.length > 300 ? '...' : ''}</div>`;
+                } else if (task.status === 'failed' && task.error) {
+                    resultHtml = `<div class="task-result" style="color: var(--accent-red);">Error: ${task.error}</div>`;
+                }
+                return `
+                <div class="task-item">
+                    <div class="task-header">
+                        <span class="task-id">#${task.id}</span>
+                        <span class="task-status ${task.status}">${task.status}</span>
+                    </div>
+                    <div class="task-desc">${task.request || task.command || 'Task in progress'}</div>
+                    <div class="task-meta">${task.created ? new Date(task.created).toLocaleString() : 'Just now'} · ${task.priority || 'normal'} priority</div>
+                    ${resultHtml}
+                </div>`;
+            }).join('');
+        }
+
+        // ==================== COMMANDS ====================
+        async function sendCommand() {
+            const input = document.getElementById('commandInput');
+            const btn = document.getElementById('executeBtn');
+            const command = input.value.trim();
+            if (!command) return;
+
+            input.value = '';
+            input.disabled = true;
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Processing...';
+
+            // Optimistic UI update
+            const tempTask = {
+                id: Date.now(),
+                request: command,
+                status: 'planning',
+                priority: 'normal',
+                created: new Date().toISOString(),
+                updated: new Date().toISOString()
+            };
+            tasks.unshift(tempTask);
+            renderTasks();
+
+            // Flash all agents to show team activation
+            agents.forEach((a, i) => {
+                setTimeout(() => activateAgent(a.key), i * 150);
+            });
+
+            try {
+                const res = await fetch('/api/command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command, priority: 'normal' })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast('Command Sent', `Task #${data.taskId} accepted. Agent team is working on it.`);
+                    // The real task will replace the temp one via SSE or next fetch
+                } else {
+                    const err = await res.json();
+                    showToast('Error', err.error || 'Failed to send command', true);
+                    tasks[0].status = 'failed';
+                    tasks[0].error = err.error;
+                    renderTasks();
+                }
+            } catch (e) {
+                showToast('Error', 'Server unreachable. Check your connection.', true);
+                tasks[0].status = 'failed';
+                tasks[0].error = 'Connection failed';
+                renderTasks();
+            }
+
+            input.disabled = false;
+            btn.disabled = false;
+            btn.innerHTML = '<span>🚀</span> Execute';
+            input.focus();
+        }
+
+        function showToast(title, message, isError = false) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-title" style="color: ${isError ? 'var(--accent-red)' : 'var(--accent-green)'}">${title}</div>
+                <div class="toast-msg">${message}</div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function focusCommand() {
+            document.getElementById('commandInput').focus();
+        }
+
+        async function toggleTeam() {
+            try {
+                const res = await fetch('/api/toggle', { method: 'POST' });
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast(data.isRunning ? 'Team Resumed' : 'Team Paused', data.message);
+                    fetchStatus();
+                }
+            } catch (e) {
+                showToast('Error', 'Could not toggle team state', true);
+            }
+        }
+
+        function activateAgent(key) {
+            const card = document.getElementById(`agent-${key}`);
+            if (card) {
+                card.classList.add('active-agent');
+                setTimeout(() => card.classList.remove('active-agent'), 1500);
+            }
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (event && event.target) {
+                event.target.closest('.nav-item').classList.add('active');
+            }
+            // In a full app, this would switch views. For now, all content is on dashboard.
+            showToast('Navigation', `${tab} tab selected (dashboard view active)`);
+        }
+
+        // ==================== INIT ====================
+        connectSSE();
+        fetchStatus();
+        fetchAionUiStatus();
+        fetchGLM52Status();
+        fetchLogs();
+        fetchTasks();
+    </script>
+</body>
+</html>

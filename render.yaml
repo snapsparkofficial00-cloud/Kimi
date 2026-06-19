@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: neuroswarm-ai
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: GEMINI_API_KEY
+        generateValue: false
+      - key: NODE_ENV
+        value: production
+      - key: SERPER_API_KEY
+        generateValue: false
+      - key: TWITTER_API_KEY
+        generateValue: false
+      - key: TWITTER_API_SECRET
+        generateValue: false
+      - key: TWITTER_ACCESS_TOKEN
+        generateValue: false
+      - key: TWITTER_ACCESS_SECRET
+        generateValue: false
+      - key: LINKEDIN_PERSON_ID
+        generateValue: false
+      - key: LINKEDIN_ACCESS_TOKEN
+        generateValue: false
+      - key: EMAIL_USER
+        generateValue: false
+      - key: EMAIL_PASS
+        generateValue: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: BINANCE_API_KEY
+        generateValue: false
+      - key: BINANCE_SECRET
+        generateValue: false
+      - key: STABILITY_API_KEY
+        generateValue: false
+      - key: REPLICATE_API_KEY
+        generateValue: false
+      - key: OPENAI_API_KEY
+        generateValue: false
+      - key: GOOGLE_TRANSLATE_API_KEY
+        generateValue: false
+    healthCheckPath: /api/status
