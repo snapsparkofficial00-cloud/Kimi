@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: neuroswarm-ai
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      # Pick ONE provider key (all have free tiers)
+      - key: OPENROUTER_API_KEY
+        generateValue: false
+      - key: GEMINI_API_KEY
+        generateValue: false
+      - key: GROQ_API_KEY
+        generateValue: false
+      - key: ANTHROPIC_API_KEY
+        generateValue: false
+      - key: OPENAI_API_KEY
+        generateValue: false
+
+      # Node settings
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+
+      # Optional services
+      - key: GITHUB_TOKEN
+        generateValue: false
+      - key: GITHUB_OWNER
+        generateValue: false
+      - key: GITHUB_REPO
+        generateValue: false
+      - key: SERPER_API_KEY
+        generateValue: false
+      - key: TWITTER_ACCESS_TOKEN
+        generateValue: false
+      - key: EMAIL_USER
+        generateValue: false
+      - key: BINANCE_API_KEY
+        generateValue: false
+      - key: STABILITY_API_KEY
+        generateValue: false
+      - key: REPLICATE_API_KEY
+        generateValue: false
+    healthCheckPath: /api/status
