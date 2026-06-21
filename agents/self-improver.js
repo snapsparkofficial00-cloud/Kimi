@@ -131,6 +131,9 @@ class SelfImprover {
           fix: 'Convert to async/await pattern'
         });
       }
+    }
+
+    return bugs;
   }
 
   async commitChanges(message) {
