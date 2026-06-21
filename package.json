@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "test": "jest",
     "lint": "eslint .",
-    "self-improve": "node -e "const SelfImprover = require('./agents/self-improver'); new SelfImprover().run()\""
+    "self-improve": "node -e \"const SelfImprover = require('./agents/self-improver'); new SelfImprover().run()\""
   },
   "dependencies": {
     "express": "^4.18.2",
